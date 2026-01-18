@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
 from sympy import diff, lambdify, Symbol, Expr
 from typing import Dict, Sequence, Union
 from .error import Error
