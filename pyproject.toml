@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "physplot"
+version = "0.1.0"
+description = "Plotting, curve fitting, and error propagation tools for physics labs"
+authors = [{name = "Anant Mathur"}]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "sympy"
+]

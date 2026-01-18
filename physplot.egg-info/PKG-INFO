@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: physplot
+Version: 0.1.0
+Summary: Plotting, curve fitting, and error propagation tools for physics labs
+Author: Anant Mathur
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: scipy
+Requires-Dist: sympy
