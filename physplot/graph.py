@@ -160,3 +160,7 @@ class Graph:
         else:
             collapsed = np.nanmean(err_array, axis=tuple(range(1, err_array.ndim)))
             return collapsed
+
+    @staticmethod
+    def show():
+        plt.show()
