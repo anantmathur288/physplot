@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Dict, Sequence, Union
+from typing import Sequence, Union
 
 NumberArray = Union[float, int, np.ndarray, Sequence[float]]
 
