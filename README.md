@@ -18,7 +18,7 @@ Import using: from physplot import Graph, Error, Propagation
     - Create Propagation object with 2 methods:
          - Use Error object: prop_obj = Propagation({variable : err_obj}, ...)
          - Use external error data: prop_obj = Propagation(manual_data = data, manual_err = err, ...)
-         - Calculate propagated error: Propagation.propagator(prop_obj, expression, ...) or prop_obj.propagator(expression, ...)
+    - Calculate propagated error: Propagation.propagator(prop_obj, expression, ...) or prop_obj.propagator(expression, ...)
 
 ## Dependencies
 Requires numpy, matplotlib, scipy and sympy (come with installation of physplot)
