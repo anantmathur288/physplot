@@ -173,3 +173,7 @@ class Graph:
     @staticmethod
     def savefig(filepath, dpi):
         plt.savefig(filepath, dpi = dpi)
+
+    def label(self, text: str, x, y, v_al = None, h_al = None):
+        self.axis.text(x, y, f"{text}", transform = self.axis.transAxes, fontsize = 12,
+                        verticalalignment = v_al, horizontalalignment = h_al)
