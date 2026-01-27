@@ -15,6 +15,7 @@ class Graph:
         self.x_axis_mean, self.x_err_mean = self._normalize_axis(x_axis, x_err)
         self.y_axis_mean, self.y_err_mean = self._normalize_axis(y_axis, y_err)
         self.parameters = None
+        self.r_value = None
 
     @staticmethod
     def plot_details(rows, cols, x_size, y_size, text=None, fontsize=None):
@@ -33,7 +34,7 @@ class Graph:
                 x_tick_start=None, x_tick_end=None, x_tick_step=None, y_tick_start=None,
                 y_tick_end=None, y_tick_step=None, line_fit_bool=False,
                 curve_fit_bool=False, fit_func=None, p0=None, fit_colors=None, fit_labels=None,
-                minor_ticks=True):
+                minor_ticks=True, r_bool = False):
 
         if self.y_err is not None or self.x_err is not None:
             self._handle_errors()
@@ -43,7 +44,7 @@ class Graph:
         if line_fit_bool:
             self._fit_line()
         if curve_fit_bool:
-            self._fit_curve(fit_func, p0, fit_colors, fit_labels)
+            self._fit_curve(fit_func, p0, fit_colors, fit_labels, r_bool)
         self._set_ticks(x_tick_start, x_tick_end, x_tick_step,
                         y_tick_start, y_tick_end, y_tick_step, minor_ticks)
         self._finalize_plot(title, x_label, y_label, text)
@@ -70,7 +71,7 @@ class Graph:
         fit_line = np.polyval(self.parameters, self.x_axis_mean)
         self.axis.plot(self.x_axis_mean, fit_line, color='grey', linestyle='dashed', label='Linear Fit')
 
-    def _fit_curve(self, fit_func, p0, fit_colors, fit_labels):
+    def _fit_curve(self, fit_func, p0, fit_colors, fit_labels, r_bool):
         if fit_func is None:
             raise ValueError("Provide fit_func for curve fitting.")
         fit_funcs = fit_func if isinstance(fit_func, (list, tuple)) else [fit_func]
@@ -82,10 +83,14 @@ class Graph:
 
         for i, func in enumerate(fit_funcs):
             try:
-                popt, _ = curve_fit(func, self.x_axis_mean, self.y_axis_mean, p0=p0s[i])
+                popt, _ = curve_fit(func, self.x_axis_mean, self.y_axis_mean, p0=p0s[i], absolute_sigma = True)
                 self.parameters.append(popt)
                 fitted_y = func(x_fit, *popt)
                 self.axis.plot(x_fit, fitted_y, color=fit_colors[i], linestyle='dashed', label=fit_labels[i])
+
+                if r_bool:
+                    self.r_value = np.corrcoef(self.x_axis_mean, self.y_axis_mean)[0, 1]
+
             except Exception as e:
                 print(f"Curve Fit {fit_labels[i]} failed: {e}")
                 self.parameters.append(None)
@@ -164,3 +169,7 @@ class Graph:
     @staticmethod
     def show():
         plt.show()
+
+    @staticmethod
+    def savefig(filepath, dpi):
+        plt.savefig(filepath, dpi = dpi)
