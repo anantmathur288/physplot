@@ -42,7 +42,7 @@ class Graph:
                                  color=color, label=label)
 
         if line_fit_bool:
-            self._fit_line(r_bool, fit_colors, slope_bool)
+            self._fit_line(r_bool, fit_colors, slope_bool, fit_labels)
         if curve_fit_bool:
             self._fit_curve(fit_func, p0, fit_colors, fit_labels, r_bool)
         self._set_ticks(x_tick_start, x_tick_end, x_tick_step,
