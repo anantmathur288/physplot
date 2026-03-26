@@ -34,7 +34,7 @@ class Graph:
                 x_tick_start=None, x_tick_end=None, x_tick_step=None, y_tick_start=None,
                 y_tick_end=None, y_tick_step=None, line_fit_bool=False,
                 curve_fit_bool=False, fit_func=None, p0=None, fit_colors=None, fit_labels=None,
-                minor_ticks=True, r_bool = False):
+                minor_ticks=True, r_bool = False, slope_bool = False):
 
         if self.y_err is not None or self.x_err is not None:
             self._handle_errors()
@@ -42,7 +42,7 @@ class Graph:
                                  color=color, label=label)
 
         if line_fit_bool:
-            self._fit_line()
+            self._fit_line(r_bool, fit_colors, slope_bool)
         if curve_fit_bool:
             self._fit_curve(fit_func, p0, fit_colors, fit_labels, r_bool)
         self._set_ticks(x_tick_start, x_tick_end, x_tick_step,
@@ -66,10 +66,14 @@ class Graph:
         self.axis.errorbar(self.x_axis_mean, self.y_axis_mean, xerr=x_err_to_use, yerr=y_err_to_use, fmt='.', capsize=3,
             color='red', label="Error")
 
-    def _fit_line(self):
+    def _fit_line(self, r_bool, fit_colors, slope_bool, fit_labels):
         self.parameters = np.polyfit(self.x_axis_mean, self.y_axis_mean, 1)
         fit_line = np.polyval(self.parameters, self.x_axis_mean)
-        self.axis.plot(self.x_axis_mean, fit_line, color='grey', linestyle='dashed', label='Linear Fit')
+
+        if r_bool:
+            self.r_value = np.corrcoef(self.x_axis_mean, self.y_axis_mean)[0, 1]
+
+        self.axis.plot(self.x_axis_mean, fit_line, color= fit_colors[0], linestyle='dashed', label=f"{fit_labels[0]}\nR² = {(self.r_value ** 2).round(2) if r_bool == True else None}\nSlope = {(self.parameters[0].round(2) if slope_bool == True else None)}")
 
     def _fit_curve(self, fit_func, p0, fit_colors, fit_labels, r_bool):
         if fit_func is None:
