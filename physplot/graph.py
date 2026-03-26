@@ -70,10 +70,16 @@ class Graph:
         self.parameters = np.polyfit(self.x_axis_mean, self.y_axis_mean, 1)
         fit_line = np.polyval(self.parameters, self.x_axis_mean)
 
+        label_parts = [fit_labels[0]]
+
         if r_bool:
             self.r_value = np.corrcoef(self.x_axis_mean, self.y_axis_mean)[0, 1]
+            label_parts.append(f"R² = {(self.r_value ** 2).round(2)}")
 
-        self.axis.plot(self.x_axis_mean, fit_line, color= fit_colors[0], linestyle='dashed', label=f"{fit_labels[0]}\nR² = {(self.r_value ** 2).round(2) if r_bool == True else None}\nSlope = {(self.parameters[0].round(2) if slope_bool == True else None)}")
+        if slope_bool:
+            label_parts.append(f"Slope = {self.parameters[0].round(2)}")
+
+        self.axis.plot(self.x_axis_mean, fit_line, color= f"{fit_colors[0] if fit_colors is not None else "grey"}", linestyle='dashed', label="\n".join(label_parts))
 
     def _fit_curve(self, fit_func, p0, fit_colors, fit_labels, r_bool):
         if fit_func is None:
