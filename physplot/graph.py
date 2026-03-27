@@ -14,7 +14,8 @@ class Graph:
         self.x_err = x_err
         self.x_axis_mean, self.x_err_mean = self._normalize_axis(x_axis, x_err)
         self.y_axis_mean, self.y_err_mean = self._normalize_axis(y_axis, y_err)
-        self.parameters = None
+        self.line_parameters = None
+        self.curve_parameters = None
         self.r_value = None
 
     @staticmethod
@@ -34,7 +35,7 @@ class Graph:
                 x_tick_start=None, x_tick_end=None, x_tick_step=None, y_tick_start=None,
                 y_tick_end=None, y_tick_step=None, line_fit_bool=False,
                 curve_fit_bool=False, fit_func=None, p0=None, fit_colors=None, fit_labels=None,
-                minor_ticks=True, r_bool = False, slope_bool = False):
+                minor_ticks=True, r_bool = False, slope_bool = False, c_bool = False):
 
         if self.y_err is not None or self.x_err is not None:
             self._handle_errors()
@@ -42,7 +43,7 @@ class Graph:
                                  color=color, label=label)
 
         if line_fit_bool:
-            self._fit_line(r_bool, fit_colors, slope_bool, fit_labels)
+            self._fit_line(r_bool, fit_colors, slope_bool, fit_labels, c_bool)
         if curve_fit_bool:
             self._fit_curve(fit_func, p0, fit_colors, fit_labels, r_bool)
         self._set_ticks(x_tick_start, x_tick_end, x_tick_step,
@@ -66,9 +67,9 @@ class Graph:
         self.axis.errorbar(self.x_axis_mean, self.y_axis_mean, xerr=x_err_to_use, yerr=y_err_to_use, fmt='.', capsize=3,
             color='red', label="Error")
 
-    def _fit_line(self, r_bool, fit_colors, slope_bool, fit_labels):
-        self.parameters = np.polyfit(self.x_axis_mean, self.y_axis_mean, 1)
-        fit_line = np.polyval(self.parameters, self.x_axis_mean)
+    def _fit_line(self, r_bool, fit_colors, slope_bool, fit_labels, c_bool):
+        self.line_parameters = np.polyfit(self.x_axis_mean, self.y_axis_mean, 1)
+        fit_line = np.polyval(self.line_parameters, self.x_axis_mean)
 
         label_parts = [fit_labels[0]]
 
@@ -77,7 +78,10 @@ class Graph:
             label_parts.append(f"R² = {(self.r_value ** 2).round(2)}")
 
         if slope_bool:
-            label_parts.append(f"Slope = {self.parameters[0].round(2)}")
+            label_parts.append(f"Slope = {self.line_parameters[0].round(2)}")
+
+        if c_bool:
+            label_parts.append(f"y-Intercept = {self.line_parameters[1].round(2)}")
 
         self.axis.plot(self.x_axis_mean, fit_line, color= f"{fit_colors[0] if fit_colors is not None else "grey"}", linestyle='dashed', label="\n".join(label_parts))
 
@@ -89,12 +93,12 @@ class Graph:
         fit_colors = self._normalize_list(fit_colors, len(fit_funcs))
         fit_labels = self._normalize_labels(fit_labels, len(fit_funcs))
         x_fit = np.linspace(min(self.x_axis_mean), max(self.x_axis_mean), 1000)
-        self.parameters = []
+        self.curve_parameters = []
 
         for i, func in enumerate(fit_funcs):
             try:
                 popt, _ = curve_fit(func, self.x_axis_mean, self.y_axis_mean, p0=p0s[i], absolute_sigma = True)
-                self.parameters.append(popt)
+                self.curve_parameters.append(popt)
                 fitted_y = func(x_fit, *popt)
                 self.axis.plot(x_fit, fitted_y, color=fit_colors[i], linestyle='dashed', label=fit_labels[i])
 
@@ -103,7 +107,7 @@ class Graph:
 
             except Exception as e:
                 print(f"Curve Fit {fit_labels[i]} failed: {e}")
-                self.parameters.append(None)
+                self.curve_parameters.append(None)
 
     def _set_ticks(self, x_start, x_end, x_step, y_start, y_end, y_step, minor_ticks):
         if minor_ticks:
