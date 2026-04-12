@@ -31,7 +31,7 @@ class Graph:
             axs = np.expand_dims(axs, axis=1)
         return fig, axs
 
-    def grapher(self, title=None, x_label=None, y_label=None, text=None, color=None, label=None,
+    def grapher(self, type = "scatter", title=None, x_label=None, y_label=None, text=None, color=None, label=None,
                 x_tick_start=None, x_tick_end=None, x_tick_step=None, y_tick_start=None,
                 y_tick_end=None, y_tick_step=None, line_fit_bool=False,
                 curve_fit_bool=False, fit_func=None, p0=None, fit_colors=None, fit_labels=None,
@@ -39,7 +39,12 @@ class Graph:
 
         if self.y_err is not None or self.x_err is not None:
             self._handle_errors()
-        dots = self.axis.scatter(self.x_axis_mean, self.y_axis_mean, marker=self.marker,
+
+        if type == "line":
+            line = self.axis.plot(self.x_axis_mean, self.y_axis_mean, marker=self.marker,
+                                 color=color, label=label)
+        elif type == "scatter" :   
+            dots = self.axis.scatter(self.x_axis_mean, self.y_axis_mean, marker=self.marker,
                                  color=color, label=label)
 
         if line_fit_bool:
@@ -50,7 +55,10 @@ class Graph:
                         y_tick_start, y_tick_end, y_tick_step, minor_ticks)
         self._finalize_plot(title, x_label, y_label, text)
 
-        return dots
+        if type == "line":
+            return line
+        else:
+            return dots
 
     def _handle_errors(self):
         def maybe_collapse(err):
